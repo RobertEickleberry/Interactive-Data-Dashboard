@@ -41,3 +41,107 @@
           { month: "Jan", revenue: 45000, users: 2400, orders: 1200, expenses: 30000 },
           { month: "Feb", revenue: 52000, users: 2800, orders: 1400, expenses: 32000 },
           { month: "Mar", revenue: 48000, users: 2600, orders: 1300, expenses: 31000 },
+          { month: "Apr", revenue: 61000, users: 3200, orders: 1600, expenses: 35000 },
+          { month: "May", revenue: 70000, users: 3800, orders: 1900, expenses: 38000 },
+          { month: "Jun", revenue: 68000, users: 3600, orders: 1800, expenses: 37000 },
+        ];
+
+        const weeklyData = [
+          { week: "Week 1", revenue: 15000, users: 800, orders: 400, expenses: 9000 },
+          { week: "Week 2", revenue: 17000, users: 900, orders: 450, expenses: 9500 },
+          { week: "Week 3", revenue: 16000, users: 850, orders: 425, expenses: 9200 },
+          { week: "Week 4", revenue: 20000, users: 1050, orders: 525, expenses: 10300 },
+        ];
+
+        const categoryData = [
+          { name: "Electronics", value: 35, color: "#667eea" },
+          { name: "Clothing", value: 25, color: "#764ba2" },
+          { name: "Food", value: 20, color: "#f093fb" },
+          { name: "Books", value: 12, color: "#4facfe" },
+          { name: "Other", value: 8, color: "#43e97b" },
+        ];
+
+        const data = timeRange === "month" ? monthlyData : weeklyData;
+
+        const stats = useMemo(() => {
+          const revenue = data.reduce((s, d) => s + d.revenue, 0);
+          const users = data.reduce((s, d) => s + d.users, 0);
+          const orders = data.reduce((s, d) => s + d.orders, 0);
+
+          return [
+            { title: "Revenue", value: `$${(revenue / 1000).toFixed(1)}k`, icon: DollarSign },
+            { title: "Users", value: `${(users / 1000).toFixed(1)}k`, icon: Users },
+            { title: "Orders", value: `${(orders / 1000).toFixed(1)}k`, icon: ShoppingCart },
+            { title: "AOV", value: `$${(revenue / orders).toFixed(0)}`, icon: TrendingUp },
+          ];
+        }, [data]);
+
+        return (
+          <div className="min-h-screen p-6 text-white max-w-7xl mx-auto">
+            <h1 className="text-4xl font-bold mb-6">Analytics Dashboard</h1>
+
+            {/* Controls */}
+            <div className="flex gap-2 mb-6">
+              <button
+                onClick={() => setTimeRange("week")}
+                className={`px-4 py-2 rounded ${timeRange === "week" ? "bg-purple-600" : "bg-gray-700"}`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => setTimeRange("month")}
+                className={`px-4 py-2 rounded ${timeRange === "month" ? "bg-purple-600" : "bg-gray-700"}`}
+              >
+                Month
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              {stats.map((s, i) => (
+                <div key={i} className="bg-gray-800 p-4 rounded">
+                  <s.icon className="w-6 h-6 mb-2" />
+                  <p className="text-gray-400 text-sm">{s.title}</p>
+                  <p className="text-2xl font-bold">{s.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-800 p-4 rounded h-[300px]">
+                <ResponsiveContainer>
+                  <AreaChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey={timeRange === "month" ? "month" : "week"} />
+                    <YAxis />
+                    <Tooltip />
+                    <Area dataKey="revenue" stroke="#667eea" fill="#667eea" fillOpacity={0.3} />
+                    <Area dataKey="expenses" stroke="#f093fb" fill="#f093fb" fillOpacity={0.3} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded h-[300px]">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={categoryData} dataKey="value" outerRadius={100} label>
+                      {categoryData.map((c, i) => (
+                        <Cell key={i} fill={c.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(
+        React.createElement(DataDashboard)
+      );
+    </script>
+  </body>
+</html>
