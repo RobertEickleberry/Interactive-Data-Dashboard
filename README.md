@@ -18,7 +18,6 @@ View Live Demo
 Switch between Week/Month views to see different time ranges. Hover over charts for detailed information. Use the publisher filter to focus on specific companies. All charts update dynamically based on your selections.
 - Run With
 - bashpython3 -m http.server 8000
-- Then open http://localhost:8000 in your browser.
 
 # Technologies
 - React
