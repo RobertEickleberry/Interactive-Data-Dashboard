@@ -1,241 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comic Book Analytics Dashboard</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.js"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom right, #111827, #1f2937, #111827);
-            min-height: 100vh;
-        }
-    </style>
-</head>
-<body>
+
+    <!-- React + ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Recharts -->
+    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+  </head>
+
+  <body class="bg-gray-900">
     <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useMemo } = React;
-        const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } = Recharts;
+    <script type="text/javascript">
+      const {
+        LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
+        XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+      } = Recharts;
 
-        const ComicDashboard = () => {
-            const [timeRange, setTimeRange] = useState('month');
-            const [selectedPublisher, setSelectedPublisher] = useState('all');
-            
-            const monthlyData = [
-                { month: 'Jan', sales: 145000, readers: 42000, issues: 520, rating: 4.2 },
-                { month: 'Feb', sales: 162000, readers: 48000, issues: 545, rating: 4.3 },
-                { month: 'Mar', sales: 158000, readers: 46000, issues: 535, rating: 4.4 },
-                { month: 'Apr', sales: 181000, readers: 52000, issues: 580, rating: 4.5 },
-                { month: 'May', sales: 195000, readers: 58000, issues: 610, rating: 4.6 },
-                { month: 'Jun', sales: 189000, readers: 55000, issues: 595, rating: 4.5 },
-            ];
-            
-            const weeklyData = [
-                { week: 'Week 1', sales: 45000, readers: 13000, issues: 140, rating: 4.3 },
-                { week: 'Week 2', sales: 51000, readers: 15000, issues: 155, rating: 4.4 },
-                { week: 'Week 3', sales: 48000, readers: 14000, issues: 148, rating: 4.5 },
-                { week: 'Week 4', sales: 55000, readers: 16000, issues: 162, rating: 4.6 },
-            ];
-            
-            const publisherData = [
-                { name: 'Marvel', value: 38, color: '#E23636' },
-                { name: 'DC Comics', value: 32, color: '#0476F2' },
-                { name: 'Image', value: 15, color: '#FF6B35' },
-                { name: 'Dark Horse', value: 8, color: '#F7B801' },
-                { name: 'IDW', value: 7, color: '#6A4C93' },
-            ];
-            
-            const genreData = [
-                { genre: 'Superhero', count: 245, revenue: 89000 },
-                { genre: 'Sci-Fi', count: 128, revenue: 45000 },
-                { genre: 'Horror', count: 95, revenue: 32000 },
-                { genre: 'Fantasy', count: 87, revenue: 28000 },
-                { genre: 'Crime', count: 72, revenue: 24000 },
-            ];
-            
-            const topComics = [
-                { title: 'The Amazing Spider-Man #42', sales: 18500, publisher: 'Marvel', rating: 4.8 },
-                { title: 'Batman: Dark Knight Returns', sales: 16200, publisher: 'DC', rating: 4.9 },
-                { title: 'Saga Vol. 10', sales: 14800, publisher: 'Image', rating: 4.7 },
-                { title: 'X-Men: Days of Future Past', sales: 13900, publisher: 'Marvel', rating: 4.6 },
-                { title: 'The Walking Dead #193', sales: 12300, publisher: 'Image', rating: 4.5 },
-            ];
-            
-            const data = timeRange === 'month' ? monthlyData : weeklyData;
-            
-            const stats = useMemo(() => {
-                const totalSales = data.reduce((sum, item) => sum + item.sales, 0);
-                const totalReaders = data.reduce((sum, item) => sum + item.readers, 0);
-                const totalIssues = data.reduce((sum, item) => sum + item.issues, 0);
-                const avgRating = (data.reduce((sum, item) => sum + item.rating, 0) / data.length).toFixed(1);
-                
-                return [
-                    { title: 'Total Sales', value: `${(totalSales / 1000).toFixed(0)}k`, change: '+18.3%', icon: '💰', color: 'from-red-500 to-red-600' },
-                    { title: 'Active Readers', value: (totalReaders / 1000).toFixed(0) + 'k', change: '+12.7%', icon: '👥', color: 'from-blue-500 to-blue-600' },
-                    { title: 'Issues Released', value: totalIssues, change: '+9.2%', icon: '📚', color: 'from-purple-500 to-purple-600' },
-                    { title: 'Avg Rating', value: `${avgRating} ⭐`, change: '+0.3', icon: '⭐', color: 'from-yellow-500 to-orange-600' },
-                ];
-            }, [data]);
-            
-            return (
-                <div className="min-h-screen p-6">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="mb-8">
-                            <div className="flex items-center gap-3 mb-2">
-                                <span className="text-5xl">⚡</span>
-                                <h1 className="text-4xl font-bold text-white">Comic Book Analytics</h1>
-                            </div>
-                            <p className="text-gray-400">Track sales, readership, and trending comics</p>
-                        </div>
-                        
-                        <div className="flex gap-4 mb-6 flex-wrap">
-                            <div className="flex gap-2 bg-gray-800 rounded-lg p-1">
-                                <button
-                                    onClick={() => setTimeRange('week')}
-                                    className={`px-4 py-2 rounded-md transition-all ${timeRange === 'week' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'}`}
-                                >
-                                    Week
-                                </button>
-                                <button
-                                    onClick={() => setTimeRange('month')}
-                                    className={`px-4 py-2 rounded-md transition-all ${timeRange === 'month' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'}`}
-                                >
-                                    Month
-                                </button>
-                            </div>
-                            
-                            <select 
-                                value={selectedPublisher}
-                                onChange={(e) => setSelectedPublisher(e.target.value)}
-                                className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500"
-                            >
-                                <option value="all">All Publishers</option>
-                                <option value="marvel">Marvel</option>
-                                <option value="dc">DC Comics</option>
-                                <option value="image">Image</option>
-                                <option value="darkhorse">Dark Horse</option>
-                            </select>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            {stats.map((stat, index) => (
-                                <div key={index} className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-red-500 transition-all hover:transform hover:scale-105">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className={`bg-gradient-to-br ${stat.color} p-3 rounded-lg text-2xl`}>
-                                            {stat.icon}
-                                        </div>
-                                        <span className="text-green-400 text-sm font-semibold">{stat.change}</span>
-                                    </div>
-                                    <h3 className="text-gray-400 text-sm mb-1">{stat.title}</h3>
-                                    <p className="text-3xl font-bold text-white">{stat.value}</p>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                                <h3 className="text-xl font-semibold text-white mb-4">📈 Sales & Reader Trends</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <AreaChart data={data}>
-                                        <defs>
-                                            <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#E23636" stopOpacity={0.8}/>
-                                                <stop offset="95%" stopColor="#E23636" stopOpacity={0}/>
-                                            </linearGradient>
-                                            <linearGradient id="colorReaders" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#0476F2" stopOpacity={0.8}/>
-                                                <stop offset="95%" stopColor="#0476F2" stopOpacity={0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                        <XAxis dataKey={timeRange === 'month' ? 'month' : 'week'} stroke="#9ca3af" />
-                                        <YAxis stroke="#9ca3af" />
-                                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                                        <Legend />
-                                        <Area type="monotone" dataKey="sales" stroke="#E23636" fillOpacity={1} fill="url(#colorSales)" />
-                                        <Area type="monotone" dataKey="readers" stroke="#0476F2" fillOpacity={1} fill="url(#colorReaders)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                            
-                            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                                <h3 className="text-xl font-semibold text-white mb-4">🏢 Market Share by Publisher</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <PieChart>
-                                        <Pie
-                                            data={publisherData}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                            outerRadius={100}
-                                            dataKey="value"
-                                        >
-                                            {publisherData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                                <h3 className="text-xl font-semibold text-white mb-4">🎭 Genre Performance</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={genreData}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                        <XAxis dataKey="genre" stroke="#9ca3af" />
-                                        <YAxis stroke="#9ca3af" />
-                                        <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-                                        <Legend />
-                                        <Bar dataKey="count" fill="#8B5CF6" name="Issues" />
-                                        <Bar dataKey="revenue" fill="#F59E0B" name="Revenue ($)" />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                            
-                            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                                <h3 className="text-xl font-semibold text-white mb-4">🏆 Top Selling Comics</h3>
-                                <div className="space-y-3">
-                                    {topComics.map((comic, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-all">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                                                    index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-600' : 'bg-red-600'
-                                                }`}>
-                                                    {index + 1}
-                                                </div>
-                                                <div>
-                                                    <p className="text-white font-medium">{comic.title}</p>
-                                                    <p className="text-gray-400 text-sm">{comic.publisher} • {comic.rating} ⭐</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-green-400 font-semibold">{(comic.sales / 1000).toFixed(1)}k</p>
-                                                <p className="text-gray-500 text-xs">copies</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+      const {
+        TrendingUp, DollarSign, Users, ShoppingCart
+      } = lucideReact;
 
-        ReactDOM.render(<ComicDashboard />, document.getElementById('root'));
-    </script>
-</body>
-</html>
+      const { useState, useMemo } = React;
+
+      function DataDashboard() {
+        const [timeRange, setTimeRange] = useState("month");
+
+        const monthlyData = [
+          { month: "Jan", revenue: 45000, users: 2400, orders: 1200, expenses: 30000 },
+          { month: "Feb", revenue: 52000, users: 2800, orders: 1400, expenses: 32000 },
+          { month: "Mar", revenue: 48000, users: 2600, orders: 1300, expenses: 31000 },
