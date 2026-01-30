@@ -1,10 +1,7 @@
 # Interactive-Data-Dashboard
 An interactive data dashboard for tracking comic book sales, readership trends, and market analytics with beautiful visualizations.
 
-# Comic Book Analytics Dashboard 📚⚡
-An interactive data dashboard for tracking comic book sales, readership trends, and market analytics with beautiful visualizations.
-Features
-
+# Features
 - Real-time sales and reader metrics with trend indicators
 - Market share breakdown by publisher (Marvel, DC, Image, Dark Horse, IDW)
 - Genre performance analysis with revenue tracking
