@@ -5,15 +5,17 @@
     <title>Analytics Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (static, no warning) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/base.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/components.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/utilities.css">
 
-    <!-- React + ReactDOM -->
+    <!-- React 18 -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel (for JSX support) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- Recharts -->
     <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
@@ -25,10 +27,10 @@
   <body class="bg-gray-900">
     <div id="root"></div>
 
-    <script type="text/javascript">
+    <script type="text/babel">
       const {
-        LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
-        XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+        AreaChart, Area, PieChart, Pie, Cell,
+        XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
       } = Recharts;
 
       const {
@@ -70,12 +72,13 @@
           const revenue = data.reduce((s, d) => s + d.revenue, 0);
           const users = data.reduce((s, d) => s + d.users, 0);
           const orders = data.reduce((s, d) => s + d.orders, 0);
+          const aov = orders ? revenue / orders : 0;
 
           return [
             { title: "Revenue", value: `$${(revenue / 1000).toFixed(1)}k`, icon: DollarSign },
             { title: "Users", value: `${(users / 1000).toFixed(1)}k`, icon: Users },
             { title: "Orders", value: `${(orders / 1000).toFixed(1)}k`, icon: ShoppingCart },
-            { title: "AOV", value: `$${(revenue / orders).toFixed(0)}`, icon: TrendingUp },
+            { title: "AOV", value: `$${aov.toFixed(0)}`, icon: TrendingUp },
           ];
         }, [data]);
 
@@ -85,25 +88,24 @@
 
             {/* Controls */}
             <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => setTimeRange("week")}
-                className={`px-4 py-2 rounded ${timeRange === "week" ? "bg-purple-600" : "bg-gray-700"}`}
-              >
-                Week
-              </button>
-              <button
-                onClick={() => setTimeRange("month")}
-                className={`px-4 py-2 rounded ${timeRange === "month" ? "bg-purple-600" : "bg-gray-700"}`}
-              >
-                Month
-              </button>
+              {["week", "month"].map(range => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`px-4 py-2 rounded ${
+                    timeRange === range ? "bg-purple-600" : "bg-gray-700"
+                  }`}
+                >
+                  {range.charAt(0).toUpperCase() + range.slice(1)}
+                </button>
+              ))}
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               {stats.map((s, i) => (
                 <div key={i} className="bg-gray-800 p-4 rounded">
-                  <s.icon className="w-6 h-6 mb-2" />
+                  {React.createElement(s.icon, { className: "w-6 h-6 mb-2" })}
                   <p className="text-gray-400 text-sm">{s.title}</p>
                   <p className="text-2xl font-bold">{s.value}</p>
                 </div>
@@ -142,9 +144,7 @@
         );
       }
 
-      ReactDOM.createRoot(document.getElementById("root")).render(
-        React.createElement(DataDashboard)
-      );
+      ReactDOM.createRoot(document.getElementById("root")).render(<DataDashboard />);
     </script>
   </body>
 </html>
