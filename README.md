@@ -12,7 +12,7 @@ An interactive data dashboard for tracking comic book sales, readership trends, 
 - Responsive design for all devices
 
 # Demo
-View Live Demo
+View Live Demo https://roberteickleberry.github.io/Interactive-Data-Dashboard/
 
 # Usage
 Switch between Week/Month views to see different time ranges. Hover over charts for detailed information. Use the publisher filter to focus on specific companies. All charts update dynamically based on your selections.
