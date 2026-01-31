@@ -2,149 +2,248 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Analytics Dashboard</title>
+    <title>Comic Book Analytics Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Tailwind CSS (static, no warning) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/base.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/components.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/utilities.css">
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- React 18 -->
+    <!-- React + ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Babel (for JSX support) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <!-- Recharts -->
     <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
   </head>
 
-  <body class="bg-gray-900">
+  <body>
     <div id="root"></div>
 
-    <script type="text/babel">
+    <script type="text/javascript">
       const {
-        AreaChart, Area, PieChart, Pie, Cell,
-        XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+        AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar,
+        XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
       } = Recharts;
 
-      const {
-        TrendingUp, DollarSign, Users, ShoppingCart
-      } = lucideReact;
+      const { useState, useMemo, createElement: h } = React;
 
-      const { useState, useMemo } = React;
-
-      function DataDashboard() {
+      function ComicDashboard() {
         const [timeRange, setTimeRange] = useState("month");
+        const [selectedPublisher, setSelectedPublisher] = useState("all");
 
         const monthlyData = [
-          { month: "Jan", revenue: 45000, users: 2400, orders: 1200, expenses: 30000 },
-          { month: "Feb", revenue: 52000, users: 2800, orders: 1400, expenses: 32000 },
-          { month: "Mar", revenue: 48000, users: 2600, orders: 1300, expenses: 31000 },
-          { month: "Apr", revenue: 61000, users: 3200, orders: 1600, expenses: 35000 },
-          { month: "May", revenue: 70000, users: 3800, orders: 1900, expenses: 38000 },
-          { month: "Jun", revenue: 68000, users: 3600, orders: 1800, expenses: 37000 },
+          { month: 'Jan', sales: 145000, readers: 42000, issues: 520, rating: 4.2 },
+          { month: 'Feb', sales: 162000, readers: 48000, issues: 545, rating: 4.3 },
+          { month: 'Mar', sales: 158000, readers: 46000, issues: 535, rating: 4.4 },
+          { month: 'Apr', sales: 181000, readers: 52000, issues: 580, rating: 4.5 },
+          { month: 'May', sales: 195000, readers: 58000, issues: 610, rating: 4.6 },
+          { month: 'Jun', sales: 189000, readers: 55000, issues: 595, rating: 4.5 },
         ];
 
         const weeklyData = [
-          { week: "Week 1", revenue: 15000, users: 800, orders: 400, expenses: 9000 },
-          { week: "Week 2", revenue: 17000, users: 900, orders: 450, expenses: 9500 },
-          { week: "Week 3", revenue: 16000, users: 850, orders: 425, expenses: 9200 },
-          { week: "Week 4", revenue: 20000, users: 1050, orders: 525, expenses: 10300 },
+          { week: 'Week 1', sales: 45000, readers: 13000, issues: 140, rating: 4.3 },
+          { week: 'Week 2', sales: 51000, readers: 15000, issues: 155, rating: 4.4 },
+          { week: 'Week 3', sales: 48000, readers: 14000, issues: 148, rating: 4.5 },
+          { week: 'Week 4', sales: 55000, readers: 16000, issues: 162, rating: 4.6 },
         ];
 
-        const categoryData = [
-          { name: "Electronics", value: 35, color: "#667eea" },
-          { name: "Clothing", value: 25, color: "#764ba2" },
-          { name: "Food", value: 20, color: "#f093fb" },
-          { name: "Books", value: 12, color: "#4facfe" },
-          { name: "Other", value: 8, color: "#43e97b" },
+        const publisherData = [
+          { name: 'Marvel', value: 38, color: '#E23636' },
+          { name: 'DC Comics', value: 32, color: '#0476F2' },
+          { name: 'Image', value: 15, color: '#FF6B35' },
+          { name: 'Dark Horse', value: 8, color: '#F7B801' },
+          { name: 'IDW', value: 7, color: '#6A4C93' },
+        ];
+
+        const genreData = [
+          { genre: 'Superhero', count: 245, revenue: 89 },
+          { genre: 'Sci-Fi', count: 128, revenue: 45 },
+          { genre: 'Horror', count: 95, revenue: 32 },
+          { genre: 'Fantasy', count: 87, revenue: 28 },
+          { genre: 'Crime', count: 72, revenue: 24 },
+        ];
+
+        const topComics = [
+          { title: 'The Amazing Spider-Man #42', sales: 18500, publisher: 'Marvel', rating: 4.8 },
+          { title: 'Batman: Dark Knight Returns', sales: 16200, publisher: 'DC', rating: 4.9 },
+          { title: 'Saga Vol. 10', sales: 14800, publisher: 'Image', rating: 4.7 },
+          { title: 'X-Men: Days of Future Past', sales: 13900, publisher: 'Marvel', rating: 4.6 },
+          { title: 'The Walking Dead #193', sales: 12300, publisher: 'Image', rating: 4.5 },
         ];
 
         const data = timeRange === "month" ? monthlyData : weeklyData;
 
         const stats = useMemo(() => {
-          const revenue = data.reduce((s, d) => s + d.revenue, 0);
-          const users = data.reduce((s, d) => s + d.users, 0);
-          const orders = data.reduce((s, d) => s + d.orders, 0);
-          const aov = orders ? revenue / orders : 0;
+          const totalSales = data.reduce((sum, item) => sum + item.sales, 0);
+          const totalReaders = data.reduce((sum, item) => sum + item.readers, 0);
+          const totalIssues = data.reduce((sum, item) => sum + item.issues, 0);
+          const avgRating = (data.reduce((sum, item) => sum + item.rating, 0) / data.length).toFixed(1);
 
           return [
-            { title: "Revenue", value: `$${(revenue / 1000).toFixed(1)}k`, icon: DollarSign },
-            { title: "Users", value: `${(users / 1000).toFixed(1)}k`, icon: Users },
-            { title: "Orders", value: `${(orders / 1000).toFixed(1)}k`, icon: ShoppingCart },
-            { title: "AOV", value: `$${aov.toFixed(0)}`, icon: TrendingUp },
+            { title: 'Total Sales', value: `${(totalSales / 1000).toFixed(0)}k`, change: '+18.3%', icon: '💰', bg: 'from-red-500 to-red-600' },
+            { title: 'Active Readers', value: (totalReaders / 1000).toFixed(0) + 'k', change: '+12.7%', icon: '👥', bg: 'from-blue-500 to-blue-600' },
+            { title: 'Issues Released', value: totalIssues, change: '+9.2%', icon: '📚', bg: 'from-purple-500 to-purple-600' },
+            { title: 'Avg Rating', value: `${avgRating} ⭐`, change: '+0.3', icon: '⭐', bg: 'from-yellow-500 to-orange-600' },
           ];
         }, [data]);
 
-        return (
-          <div className="min-h-screen p-6 text-white max-w-7xl mx-auto">
-            <h1 className="text-4xl font-bold mb-6">Analytics Dashboard</h1>
+        const getRankBg = (i) => i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-gray-400' : i === 2 ? 'bg-orange-600' : 'bg-red-600';
 
-            {/* Controls */}
-            <div className="flex gap-2 mb-6">
-              {["week", "month"].map(range => (
-                <button
-                  key={range}
-                  onClick={() => setTimeRange(range)}
-                  className={`px-4 py-2 rounded ${
-                    timeRange === range ? "bg-purple-600" : "bg-gray-700"
-                  }`}
-                >
-                  {range.charAt(0).toUpperCase() + range.slice(1)}
-                </button>
-              ))}
-            </div>
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 text-white' },
+          h('div', { className: 'max-w-7xl mx-auto' },
+            // Header
+            h('div', { className: 'mb-8' },
+              h('div', { className: 'flex items-center gap-3 mb-2' },
+                h('span', { className: 'text-5xl' }, '⚡'),
+                h('h1', { className: 'text-4xl font-bold' }, 'Comic Book Analytics')
+              ),
+              h('p', { className: 'text-gray-400' }, 'Track sales, readership, and trending comics')
+            ),
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              {stats.map((s, i) => (
-                <div key={i} className="bg-gray-800 p-4 rounded">
-                  {React.createElement(s.icon, { className: "w-6 h-6 mb-2" })}
-                  <p className="text-gray-400 text-sm">{s.title}</p>
-                  <p className="text-2xl font-bold">{s.value}</p>
-                </div>
-              ))}
-            </div>
+            // Controls
+            h('div', { className: 'flex gap-4 mb-6 flex-wrap' },
+              h('div', { className: 'flex gap-2 bg-gray-800 rounded-lg p-1' },
+                h('button', {
+                  onClick: () => setTimeRange('week'),
+                  className: `px-4 py-2 rounded transition ${timeRange === 'week' ? 'bg-red-600' : 'text-gray-400 hover:text-white'}`
+                }, 'Week'),
+                h('button', {
+                  onClick: () => setTimeRange('month'),
+                  className: `px-4 py-2 rounded transition ${timeRange === 'month' ? 'bg-red-600' : 'text-gray-400 hover:text-white'}`
+                }, 'Month')
+              ),
+              h('select', {
+                value: selectedPublisher,
+                onChange: (e) => setSelectedPublisher(e.target.value),
+                className: 'bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700'
+              },
+                h('option', { value: 'all' }, 'All Publishers'),
+                h('option', { value: 'marvel' }, 'Marvel'),
+                h('option', { value: 'dc' }, 'DC Comics'),
+                h('option', { value: 'image' }, 'Image'),
+                h('option', { value: 'darkhorse' }, 'Dark Horse')
+              )
+            ),
 
-            {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-800 p-4 rounded h-[300px]">
-                <ResponsiveContainer>
-                  <AreaChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey={timeRange === "month" ? "month" : "week"} />
-                    <YAxis />
-                    <Tooltip />
-                    <Area dataKey="revenue" stroke="#667eea" fill="#667eea" fillOpacity={0.3} />
-                    <Area dataKey="expenses" stroke="#f093fb" fill="#f093fb" fillOpacity={0.3} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+            // Stats
+            h('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8' },
+              ...stats.map((s, i) =>
+                h('div', { key: i, className: 'bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-red-500 transition hover:scale-105' },
+                  h('div', { className: 'flex items-center justify-between mb-4' },
+                    h('div', { className: `bg-gradient-to-br ${s.bg} p-3 rounded-lg text-2xl` }, s.icon),
+                    h('span', { className: 'text-green-400 text-sm font-semibold' }, s.change)
+                  ),
+                  h('p', { className: 'text-gray-400 text-sm mb-1' }, s.title),
+                  h('p', { className: 'text-3xl font-bold' }, s.value)
+                )
+              )
+            ),
 
-              <div className="bg-gray-800 p-4 rounded h-[300px]">
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie data={categoryData} dataKey="value" outerRadius={100} label>
-                      {categoryData.map((c, i) => (
-                        <Cell key={i} fill={c.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
+            // Charts Row 1
+            h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6' },
+              // Area Chart
+              h('div', { className: 'bg-gray-800 rounded-xl p-6 border border-gray-700' },
+                h('h3', { className: 'text-xl font-semibold mb-4' }, '📈 Sales & Reader Trends'),
+                h('div', { className: 'h-[300px]' },
+                  h(ResponsiveContainer, null,
+                    h(AreaChart, { data },
+                      h('defs', null,
+                        h('linearGradient', { id: 'colorSales', x1: '0', y1: '0', x2: '0', y2: '1' },
+                          h('stop', { offset: '5%', stopColor: '#E23636', stopOpacity: 0.8 }),
+                          h('stop', { offset: '95%', stopColor: '#E23636', stopOpacity: 0 })
+                        ),
+                        h('linearGradient', { id: 'colorReaders', x1: '0', y1: '0', x2: '0', y2: '1' },
+                          h('stop', { offset: '5%', stopColor: '#0476F2', stopOpacity: 0.8 }),
+                          h('stop', { offset: '95%', stopColor: '#0476F2', stopOpacity: 0 })
+                        )
+                      ),
+                      h(CartesianGrid, { strokeDasharray: '3 3', stroke: '#374151' }),
+                      h(XAxis, { dataKey: timeRange === 'month' ? 'month' : 'week', stroke: '#9ca3af' }),
+                      h(YAxis, { stroke: '#9ca3af' }),
+                      h(Tooltip, { contentStyle: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' } }),
+                      h(Legend),
+                      h(Area, { type: 'monotone', dataKey: 'sales', stroke: '#E23636', fillOpacity: 1, fill: 'url(#colorSales)' }),
+                      h(Area, { type: 'monotone', dataKey: 'readers', stroke: '#0476F2', fillOpacity: 1, fill: 'url(#colorReaders)' })
+                    )
+                  )
+                )
+              ),
+
+              // Pie Chart
+              h('div', { className: 'bg-gray-800 rounded-xl p-6 border border-gray-700' },
+                h('h3', { className: 'text-xl font-semibold mb-4' }, '🏢 Market Share by Publisher'),
+                h('div', { className: 'h-[300px]' },
+                  h(ResponsiveContainer, null,
+                    h(PieChart, null,
+                      h(Pie, {
+                        data: publisherData,
+                        cx: '50%',
+                        cy: '50%',
+                        labelLine: false,
+                        label: ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`,
+                        outerRadius: 100,
+                        dataKey: 'value'
+                      },
+                        ...publisherData.map((entry, index) =>
+                          h(Cell, { key: `cell-${index}`, fill: entry.color })
+                        )
+                      ),
+                      h(Tooltip, { contentStyle: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' } })
+                    )
+                  )
+                )
+              )
+            ),
+
+            // Charts Row 2
+            h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+              // Bar Chart
+              h('div', { className: 'bg-gray-800 rounded-xl p-6 border border-gray-700' },
+                h('h3', { className: 'text-xl font-semibold mb-4' }, '🎭 Genre Performance'),
+                h('div', { className: 'h-[300px]' },
+                  h(ResponsiveContainer, null,
+                    h(BarChart, { data: genreData },
+                      h(CartesianGrid, { strokeDasharray: '3 3', stroke: '#374151' }),
+                      h(XAxis, { dataKey: 'genre', stroke: '#9ca3af' }),
+                      h(YAxis, { stroke: '#9ca3af' }),
+                      h(Tooltip, { contentStyle: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' } }),
+                      h(Legend),
+                      h(Bar, { dataKey: 'count', fill: '#8B5CF6', name: 'Issues' }),
+                      h(Bar, { dataKey: 'revenue', fill: '#F59E0B', name: 'Revenue ($K)' })
+                    )
+                  )
+                )
+              ),
+
+              // Top Comics List
+              h('div', { className: 'bg-gray-800 rounded-xl p-6 border border-gray-700' },
+                h('h3', { className: 'text-xl font-semibold mb-4' }, '🏆 Top Selling Comics'),
+                h('div', { className: 'space-y-3' },
+                  ...topComics.map((comic, i) =>
+                    h('div', { key: i, className: 'flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition' },
+                      h('div', { className: 'flex items-center gap-3' },
+                        h('div', { className: `w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${getRankBg(i)}` }, i + 1),
+                        h('div', null,
+                          h('p', { className: 'font-medium' }, comic.title),
+                          h('p', { className: 'text-gray-400 text-sm' }, `${comic.publisher} • ${comic.rating} ⭐`)
+                        )
+                      ),
+                      h('div', { className: 'text-right' },
+                        h('p', { className: 'text-green-400 font-semibold' }, `${(comic.sales / 1000).toFixed(1)}k`),
+                        h('p', { className: 'text-gray-500 text-xs' }, 'copies')
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
         );
       }
 
-      ReactDOM.createRoot(document.getElementById("root")).render(<DataDashboard />);
+      ReactDOM.createRoot(document.getElementById("root")).render(
+        h(ComicDashboard)
+      );
     </script>
   </body>
 </html>
